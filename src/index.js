@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Routes for Users
 app.post('/users', async (req, res) => {
   const user = new User(req.body);
   try {
@@ -22,6 +23,27 @@ app.get('/users', async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.patch('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.delete('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    res.send(user);
   } catch (err) {
     res.status(400).send(err);
   }
@@ -57,9 +79,31 @@ app.get('/tasks', async (req, res) => {
 });
 
 app.get('/tasks/:id', async (req, res) => {
+  console.log('nani');
   try {
     const task = await Task.findById(req.params.id);
     res.send(task);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.patch('/tasks/:id', async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    res.send(task);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const user = await Task.findByIdAndDelete(req.params.id);
+    res.send(user);
   } catch (err) {
     res.status(400).send(err);
   }
