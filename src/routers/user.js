@@ -24,11 +24,22 @@ router.get('/users', async (req, res) => {
 });
 
 router.patch('/users/:id', async (req, res) => {
+  const fields = ['name', 'email', 'password', 'age'];
+  const isFieldsValid = Object.keys(req.body).every(field =>
+    fields.includes(field)
+  );
+
+  if (!isFieldsValid) {
+    return res.status(400).send('Invalid field');
+  }
+
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
+    const user = await User.findById(req.params.id);
+    Object.keys(req.body).forEach(field => {
+      user[field] = req.body[field];
     });
+
+    await user.save();
     res.send(user);
   } catch (err) {
     res.status(400).send(err);
