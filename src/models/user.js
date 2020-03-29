@@ -54,6 +54,15 @@ const userSchema = mongoose.Schema({
 // Instance methods
 // regular function is used to be able to use the this binding
 // (ie dont chnage this to arrow function)
+userSchema.methods.toJSON = function() {
+  const user = this;
+
+  return {
+    age: user.age,
+    email: user.email,
+    name: user.name
+  };
+};
 userSchema.methods.generateAuthToken = async function() {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, 'task-management');

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = new express.Router();
+const authMiddleWare = require('../middleware/auth');
 
 const User = require('../models/user');
 
@@ -13,6 +14,10 @@ router.post('/users', async (req, res) => {
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+router.get('/users/me', authMiddleWare, async (req, res) => {
+  res.send(req.user);
 });
 
 router.post('/users/login', async (req, res) => {
@@ -30,16 +35,33 @@ router.post('/users/login', async (req, res) => {
   }
 });
 
-router.get('/users', async (req, res) => {
+router.post('/users/logout', authMiddleWare, async (req, res) => {
   try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send(err);
+    req.user.tokens = req.user.tokens.filter(
+      token => token.token !== req.token
+    );
+
+    await req.user.save();
+
+    res.send();
+  } catch (e) {
+    res.status(500).send();
   }
 });
 
-router.patch('/users/:id', async (req, res) => {
+router.post('/users/logoutAll', authMiddleWare, async (req, res) => {
+  try {
+    req.user.tokens = [];
+
+    await req.user.save();
+
+    res.send();
+  } catch (e) {
+    res.status(500).send();
+  }
+});
+
+router.patch('/users/me', authMiddleWare, async (req, res) => {
   const fields = ['name', 'email', 'password', 'age'];
   const isFieldsValid = Object.keys(req.body).every(field =>
     fields.includes(field)
@@ -50,7 +72,7 @@ router.patch('/users/:id', async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.params.id);
+    const user = req.user;
     Object.keys(req.body).forEach(field => {
       user[field] = req.body[field];
     });
@@ -62,21 +84,12 @@ router.patch('/users/:id', async (req, res) => {
   }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/me', authMiddleWare, async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    res.send(user);
+    await req.user.remove();
+    res.send(req.user);
   } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
-router.get('/users/:id', async (req, res) => {
-  try {
-    const users = await User.findById(req.params.id);
-    res.send(users);
-  } catch (err) {
-    res.status(400).send(err);
+    res.status(500).send(err);
   }
 });
 
