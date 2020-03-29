@@ -38,7 +38,7 @@ router.get('/tasks/:id', authMiddleWare, async (req, res) => {
   }
 });
 
-router.patch('/tasks/:id', async (req, res) => {
+router.patch('/tasks/:id', authMiddleWare, async (req, res) => {
   try {
     const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -58,4 +58,5 @@ router.delete('/tasks/:id', async (req, res) => {
     res.status(400).send(err);
   }
 });
+
 module.exports = router;
