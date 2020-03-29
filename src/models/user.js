@@ -51,6 +51,12 @@ const userSchema = mongoose.Schema({
   ]
 });
 
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner'
+});
+
 // Instance methods
 // regular function is used to be able to use the this binding
 // (ie dont chnage this to arrow function)

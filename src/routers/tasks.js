@@ -15,18 +15,23 @@ router.post('/tasks', authMiddleWare, async (req, res) => {
   }
 });
 
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', authMiddleWare, async (req, res) => {
   try {
-    const tasks = await Task.find({});
-    res.send(tasks);
+    //const tasks = await Task.find({ owner: req.user._id });
+    await req.user.populate('tasks').execPopulate();
+    res.send(req.user.tasks);
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
-router.get('/tasks/:id', async (req, res) => {
+router.get('/tasks/:id', authMiddleWare, async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    });
+
     res.send(task);
   } catch (err) {
     res.status(400).send(err);
