@@ -42,8 +42,6 @@ router.get('/tasks', authMiddleWare, async (req, res) => {
   }
 
   options = { ...options, sort };
-  console.log(options);
-
   try {
     await req.user
       .populate({
