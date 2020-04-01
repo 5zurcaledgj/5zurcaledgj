@@ -18,7 +18,14 @@ router.post('/tasks', authMiddleWare, async (req, res) => {
 router.get('/tasks', authMiddleWare, async (req, res) => {
   try {
     //const tasks = await Task.find({ owner: req.user._id });
-    await req.user.populate('tasks').execPopulate();
+    await req.user
+      .populate({
+        path: 'tasks',
+        match: {
+          isDone: false
+        }
+      })
+      .execPopulate();
     res.send(req.user.tasks);
   } catch (err) {
     res.status(400).send(err);
