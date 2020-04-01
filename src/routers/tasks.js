@@ -16,16 +16,40 @@ router.post('/tasks', authMiddleWare, async (req, res) => {
 });
 
 router.get('/tasks', authMiddleWare, async (req, res) => {
-  const match = {};
-  if (req.query.completed) {
-    match.completed = 'true' === req.query.completed;
+  let match = {};
+  if (req.query.isDone) {
+    match.isDone = 'true' === req.query.isDone;
   }
+
+  let options = {};
+  if (req.query.limit) {
+    options.limit = parseInt(req.query.limit);
+  }
+
+  if (req.query.skip) {
+    options.skip = parseInt(req.query.skip);
+  }
+
+  let sort = {};
+  if (req.query.sortBy) {
+    const [field, order] = req.query.sortBy.split('_');
+    const _order = {
+      asd: 1,
+      desc: -1
+    };
+
+    sort[field] = _order[order];
+  }
+
+  options = { ...options, sort };
+  console.log(options);
 
   try {
     await req.user
       .populate({
         path: 'tasks',
-        match
+        match,
+        options
       })
       .execPopulate();
     res.send(req.user.tasks);

@@ -32,7 +32,9 @@ TaskSchema.methods.toJSON = function() {
   return {
     title: task.title,
     description: task.description,
-    isDone: task.isDone
+    isDone: task.isDone,
+    createdAt: task.createdAt,
+    updatedAt: task.updatedAt
   };
 };
 
