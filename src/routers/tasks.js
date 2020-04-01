@@ -16,14 +16,16 @@ router.post('/tasks', authMiddleWare, async (req, res) => {
 });
 
 router.get('/tasks', authMiddleWare, async (req, res) => {
+  const match = {};
+  if (req.query.completed) {
+    match.completed = 'true' === req.query.completed;
+  }
+
   try {
-    //const tasks = await Task.find({ owner: req.user._id });
     await req.user
       .populate({
         path: 'tasks',
-        match: {
-          isDone: false
-        }
+        match
       })
       .execPopulate();
     res.send(req.user.tasks);
